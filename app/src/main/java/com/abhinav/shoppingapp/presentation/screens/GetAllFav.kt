@@ -6,6 +6,6 @@ import androidx.navigation.NavController
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 
 @Composable
-fun GetAllFav(viewModel: ShoppingAppViewModel = hiltViewModel(),navController: NavController){
+fun GetAllFav(navController: NavController){
 
 }

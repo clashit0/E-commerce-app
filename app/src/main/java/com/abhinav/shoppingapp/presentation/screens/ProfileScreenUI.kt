@@ -7,6 +7,6 @@ import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun ProfileScreenUI(viewModel: ShoppingAppViewModel = hiltViewModel(),navController: NavController, firebaseAuth: FirebaseAuth){
+fun ProfileScreenUI(navController: NavController, firebaseAuth: FirebaseAuth){
 
 }

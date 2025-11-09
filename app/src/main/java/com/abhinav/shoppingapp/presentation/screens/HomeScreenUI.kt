@@ -6,6 +6,6 @@ import androidx.navigation.NavController
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 
 @Composable
-fun HomeScreenUI(viewModel: ShoppingAppViewModel = hiltViewModel(),navController: NavController){
+fun HomeScreenUI(navController: NavController){
 
 }

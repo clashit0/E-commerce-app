@@ -6,6 +6,6 @@ import androidx.navigation.NavController
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 
 @Composable
-fun EachCategoriesScreen(viewModel: ShoppingAppViewModel = hiltViewModel(), navController: NavController, categoryName: String) {
+fun EachCategoriesScreen( navController: NavController, categoryName: String) {
 
 }

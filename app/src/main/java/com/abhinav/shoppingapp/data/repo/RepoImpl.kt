@@ -13,10 +13,8 @@ import com.abhinav.shoppingapp.domain.models.ProductsDataModels
 import com.abhinav.shoppingapp.domain.models.UserData
 import com.abhinav.shoppingapp.domain.models.UserDataParent
 import com.abhinav.shoppingapp.domain.repo.Repo
-import com.google.android.recaptcha.internal.zzqy
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.auth.User
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +23,7 @@ import javax.inject.Inject
 
 class RepoImpl @Inject constructor(
     var firebaseAuth: FirebaseAuth,
-    var firebaseFirestore: FirebaseFirestore
+    var firebaseFirestore: FirebaseFirestore,
 ) : Repo {
     override fun registerUserWithEmailAndPassword(userData: UserData): Flow<ResultState<String>> =
         callbackFlow {

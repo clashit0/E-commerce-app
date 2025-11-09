@@ -7,6 +7,6 @@ import com.abhinav.shoppingapp.presentation.navigation.Routes
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 
 @Composable
-fun CheckoutScreen(viewModel: ShoppingAppViewModel = hiltViewModel(),navController: NavController, productId : String){
+fun CheckoutScreen(navController: NavController, productId : String){
 
 }

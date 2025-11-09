@@ -28,12 +28,14 @@ import com.abhinav.shoppingapp.domain.useCase.GetUserUseCase
 import com.abhinav.shoppingapp.domain.useCase.LoginUserUseCase
 import com.abhinav.shoppingapp.domain.useCase.UpdateUseDataUseCase
 import com.abhinav.shoppingapp.domain.useCase.UserProfileImageUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class ShoppingAppViewModel @Inject constructor(
     private val loginUserUseCase: LoginUserUseCase,
     private val addToCartUseCase: AddToCartUseCase,

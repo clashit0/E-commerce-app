@@ -7,6 +7,6 @@ import com.abhinav.shoppingapp.presentation.navigation.Routes
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 
 @Composable
-fun AllCategoriesScreen(viewModel: ShoppingAppViewModel = hiltViewModel(), navController: NavController){
+fun AllCategoriesScreen( navController: NavController){
 
 }
