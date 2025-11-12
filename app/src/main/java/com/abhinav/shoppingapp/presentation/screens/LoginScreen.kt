@@ -22,7 +22,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,8 +40,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.abhinav.shoppingapp.R
+import com.abhinav.shoppingapp.domain.models.UserData
 import com.abhinav.shoppingapp.presentation.Utils.CustomTextField
 import com.abhinav.shoppingapp.presentation.Utils.SuccessAlertDialog
+import com.abhinav.shoppingapp.presentation.navigation.Routes
 import com.abhinav.shoppingapp.presentation.navigation.SubNavigation
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 
@@ -127,13 +128,26 @@ fun LoginScreenUi(
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     colorResource(id = R.color.orange)),
-                onClick = {}
+                onClick = {
+                    if (email.isNotBlank() && password.isNotBlank()) {
+                        val userData = UserData(
+                            firstName = "",
+                            lastName = "",
+                            email = email,
+                            password = password,
+                            phoneNumber = ""
+                        )
+                        viewModel.loginUser(userData)
+                    }
+                }
             ) { Text("Login",
                 color = colorResource(R.color.white))
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 androidx.compose.material3.Text("Don't have an account?")
-                TextButton(onClick = {/*navigate to login screen*/}) {
+                TextButton(onClick = {
+                    navController.navigate(Routes.SignUpScreen.route)
+                }) {
                     androidx.compose.material3.Text(
                         "SignUp",
                         color = colorResource(id = R.color.orange)

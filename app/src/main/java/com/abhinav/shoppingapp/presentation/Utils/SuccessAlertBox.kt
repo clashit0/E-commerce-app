@@ -12,9 +12,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -27,68 +27,81 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.abhinav.shoppingapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SuccessAlertDialog(onClick: () -> Unit) {
-    BasicAlertDialog(
-        onDismissRequest = {},
-        modifier = Modifier.background(shape = RoundedCornerShape(16.dp), color = Color.White),
-        content = {
+    Dialog(
+        onDismissRequest = { /* Don't allow dismiss */ }
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally
-
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Success icon
                 Box(
                     modifier = Modifier
                         .size(64.dp)
-                        .background(color = colorResource(R.color.orange), shape = CircleShape)
+                        .background(
+                            color = colorResource(R.color.orange),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Success",
-                        tint = Color.Gray,
+                        tint = Color.White,
                         modifier = Modifier.size(32.dp)
                     )
+                }
 
-                    Spacer(Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
+                Text(
+                    text = "Success",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.orange)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Congratulations, you have completed your registration!",
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    lineHeight = 20.sp
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = onClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(R.color.orange)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
                     Text(
-                        "Success",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.orange)
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        "Congratulation, you have \n completed you registration!",
-                        textAlign = TextAlign.Center,
+                        text = "Go to Home",
+                        color = Color.White,
                         fontSize = 16.sp
                     )
-
-                    Spacer(Modifier.height(24.dp))
-
-                    Button(
-                        onClick = onClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        colors = ButtonDefaults.buttonColors(colorResource(R.color.orange)),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            "Go to Home",
-                            color = Color.Gray
-                        )
-
-                    }
                 }
             }
         }
-    )
+    }
 }

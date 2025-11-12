@@ -30,21 +30,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.abhinav.shoppingapp.R
+import com.abhinav.shoppingapp.domain.models.UserData
 import com.abhinav.shoppingapp.presentation.Utils.CustomTextField
 import com.abhinav.shoppingapp.presentation.Utils.SuccessAlertDialog
+import com.abhinav.shoppingapp.presentation.navigation.Routes
 import com.abhinav.shoppingapp.presentation.navigation.SubNavigation
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 
@@ -72,7 +74,18 @@ fun SignUpScreen(
                 navController.navigate(SubNavigation.MainHomeScreen.route)
             }
         )
-    }else{
+        return
+    }else if (state.value.errorMessage != null) {
+        // Don't return here - just show the error message above the form
+        Text(
+            text = "Error: ${state.value.errorMessage}",
+            color = Color.Red,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+    }
+    else{
         val context = LocalContext.current
         var firstName by remember { mutableStateOf("") }
         var lastName by remember { mutableStateOf("") }
@@ -171,11 +184,24 @@ fun SignUpScreen(
                 colors = ButtonDefaults.buttonColors(colorResource(id = R.color.orange)),
                 onClick = {
                     if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+
                         Toast.makeText(context, "Please fill all the fields", Toast.LENGTH_SHORT).show()
+                        return@Button
                     }
                     if (password != confirmPassword) {
                         Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        return@Button
                     } else {
+                        val userData = UserData(
+                            firstName = firstName,
+                            lastName = lastName,
+                            email = email,
+                            password = password,
+                            phoneNumber = phoneNumber
+                        )
+                        viewModel.createUser(
+                            userData = userData
+                        )
                         Toast.makeText(context, "Sign Up Successful", Toast.LENGTH_SHORT).show()
                     }
                 }) {
@@ -183,7 +209,9 @@ fun SignUpScreen(
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Already have an account?")
-                TextButton(onClick = {/*navigate to login screen*/}) {
+                TextButton(onClick = {
+                    navController.popBackStack()
+                }) {
                     Text("Login",
                         color = colorResource(id = R.color.orange))
                 }
