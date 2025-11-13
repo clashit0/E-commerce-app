@@ -64,9 +64,9 @@ fun App(
 
     var selectedItem by remember { mutableStateOf(0) }
 
-    val navBackSTackEntry by navController.currentBackStackEntryAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-    val currentDestination = navBackSTackEntry?.destination?.route
+    val currentDestination = navBackStackEntry?.destination?.route
 
     val shouldShowBottomBar = remember { mutableStateOf(false) }
 
@@ -76,6 +76,15 @@ fun App(
             else -> true
         }
     }
+
+    selectedItem = when (currentDestination) {
+        Routes.HomeScreen.route -> 0
+        Routes.WishlistScreen.route -> 1
+        Routes.CartScreen.route -> 2
+        Routes.ProfileScreen.route -> 3
+        else -> selectedItem
+    }
+
 
     val BottomNavItem = listOf(
         BottomNavItem("Home", Icons.Default.Home, unselectedIcon = Icons.Outlined.Home),
