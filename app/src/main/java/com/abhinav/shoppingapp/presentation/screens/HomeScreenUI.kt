@@ -33,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,7 +56,6 @@ import com.abhinav.shoppingapp.domain.models.ProductsDataModels
 import com.abhinav.shoppingapp.presentation.Utils.Banner
 import com.abhinav.shoppingapp.presentation.navigation.Routes
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
-import okhttp3.internal.wait
 
 @Composable
 fun HomeScreenUI(
@@ -180,8 +178,30 @@ fun HomeScreenUI(
 
                 Column {
                     Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        Text("Flash Sale",
+                            style = MaterialTheme.typography.titleMedium)
 
-                    ){  }
+                        Text("See More",
+                            color = colorResource(R.color.orange),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.clickable{
+                                navController.navigate(Routes.SeeAllProductScreen.route)
+                            })
+                    }
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)){
+                        items(homeState.products?:emptyList()){product->
+                            ProductCard(product = product, navController = navController)
+                        }
+                    }
+
+
                 }
             }
         }
@@ -199,7 +219,7 @@ fun CategoryItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(end = 16.dp)
-            .clickable { onClick }
+            .clickable { onClick() }
     ) {
         Box(
             modifier = Modifier
@@ -229,7 +249,7 @@ fun ProductCard(product: ProductsDataModels, navController: NavController) {
         modifier = Modifier
             .width(150.dp)
             .clickable {
-                navController.navigate("EachProductDetailsScreen/${product.productId}")
+                navController.navigate(Routes.EachProductDetailsScreen.route+"/${product.productId}")
             }
             .aspectRatio(0.7f),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
