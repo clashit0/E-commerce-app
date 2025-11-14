@@ -141,7 +141,7 @@ class RepoImpl @Inject constructor(
     override fun getCategoriesInLimited(): Flow<ResultState<List<CategoryDataModels>>> =
         callbackFlow {
             trySend(ResultState.Loading)
-            firebaseFirestore.collection("Categories").limit(7).get()
+            firebaseFirestore.collection("categories").limit(7).get()
                 .addOnSuccessListener { querySnapshot ->
                     val categories = querySnapshot.mapNotNull { document ->
                         document.toObject(CategoryDataModels::class.java)
@@ -278,7 +278,7 @@ class RepoImpl @Inject constructor(
     override fun getAllCategories(): Flow<ResultState<List<CategoryDataModels>>> =
         callbackFlow {
             trySend(ResultState.Loading)
-            firebaseFirestore.collection("Categories").get().addOnSuccessListener {
+            firebaseFirestore.collection("categories").get().addOnSuccessListener {
                 val categories = it.documents.mapNotNull { documentSnapshot ->
                     documentSnapshot.toObject(CategoryDataModels::class.java)
                 }

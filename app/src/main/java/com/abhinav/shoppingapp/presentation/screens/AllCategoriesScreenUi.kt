@@ -122,12 +122,12 @@ fun CategoryCard(category: CategoryDataModels,onCategoryClick: () -> Unit){
         modifier = Modifier.padding(8.dp)
             .fillMaxWidth()
             .clickable{
-                onCategoryClick
+                onCategoryClick()
             }
     ) {
         Column {
             AsyncImage(
-                model ="",
+                model =category.categoryImage ,
                 contentDescription = category.name,
                 modifier = Modifier.fillMaxWidth()
                     .height(120.dp),

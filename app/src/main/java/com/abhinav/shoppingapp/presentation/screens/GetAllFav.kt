@@ -156,7 +156,7 @@ fun ProductCard(product: ProductsDataModels, onProductClick: () -> Unit) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = product.name,
+                    text = "Rs ${product.price}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
