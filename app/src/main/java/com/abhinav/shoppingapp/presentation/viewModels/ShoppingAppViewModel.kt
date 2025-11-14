@@ -608,6 +608,7 @@ class ShoppingAppViewModel @Inject constructor(
         }
 
     }
+
 }
 
 data class ProfileScreenState(

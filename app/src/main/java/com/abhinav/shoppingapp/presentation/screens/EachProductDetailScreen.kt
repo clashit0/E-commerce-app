@@ -225,7 +225,7 @@ fun EachProductDetailsScreen(
                                     image = product.image,
                                     name = product.name,
                                     price = product.price,
-                                    quantity = quantity.toString(),
+                                    quantity = quantity,
                                     size = selectedSize,
                                     description = product.description,
                                     category = product.category
@@ -257,9 +257,9 @@ fun EachProductDetailsScreen(
                         ) {
                             Row {
                                 Icon(
-                                    if (isFavourite){
+                                    if (isFavourite) {
                                         Icons.Default.Favorite
-                                    }else{
+                                    } else {
                                         Icons.Default.FavoriteBorder
 
                                     },
@@ -267,16 +267,16 @@ fun EachProductDetailsScreen(
                                 )
 
                                 Text("Add to Wishlist")
+
+
                             }
                         }
-
 
                     }
                 }
 
             }
+
         }
-
     }
-
 }

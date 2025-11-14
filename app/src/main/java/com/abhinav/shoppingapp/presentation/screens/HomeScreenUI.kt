@@ -144,9 +144,10 @@ fun HomeScreenUI(
                             "Categories",
                             style = MaterialTheme.typography.titleMedium
                         )
-                        Text("See more",
+                        Text(
+                            "See more",
                             color = colorResource(R.color.orange),
-                            modifier = Modifier.clickable{
+                            modifier = Modifier.clickable {
                                 navController.navigate(Routes.AllCategoriesScreen.route)
                             },
                             style = MaterialTheme.typography.bodyMedium
@@ -157,19 +158,19 @@ fun HomeScreenUI(
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        items(homeState.categories?:emptyList()){category ->
+                        items(homeState.categories ?: emptyList()) { category ->
                             CategoryItem(
                                 imageUri = category.categoryImage,
                                 category = category.name,
                                 onClick = {
-                                    navController.navigate(Routes.EachCategoryItemScreens.route+"/${category.name}")
+                                    navController.navigate(Routes.EachCategoryItemScreens.route + "/${category.name}")
                                 }
                             )
                         }
                     }
                 }
 
-                homeState.banners?.let { banners->
+                homeState.banners?.let { banners ->
                     Banner(banners = banners)
 
                 }
@@ -178,30 +179,108 @@ fun HomeScreenUI(
 
                 Column {
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
-                    ){
-                        Text("Flash Sale",
-                            style = MaterialTheme.typography.titleMedium)
+                    ) {
+                        Text(
+                            "Flash Sale",
+                            style = MaterialTheme.typography.titleMedium
+                        )
 
-                        Text("See More",
+                        Text(
+                            "See More",
                             color = colorResource(R.color.orange),
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.clickable{
+                            modifier = Modifier.clickable {
                                 navController.navigate(Routes.SeeAllProductScreen.route)
                             })
                     }
                     LazyRow(
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)){
-                        items(homeState.products?:emptyList()){product->
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(homeState.products ?: emptyList()) { product ->
                             ProductCard(product = product, navController = navController)
                         }
                     }
 
 
+                }
+
+                //build the suggested for you
+                Column(
+                    modifier = Modifier.padding(top = 16.dp, bottom = 5.dp)
+                ) {
+                    when {
+                        getAllSuggestedProduct.value.isLoading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+
+                        getAllSuggestedProduct.value.errorMessage != null -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(getAllSuggestedProduct.value.errorMessage!!)
+                            }
+                        }
+
+                        getAllSuggestedProductData.isEmpty() -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("No products to suggest")
+                            }
+
+                        }
+
+                        else -> {
+                            Column {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        "Suggested for you",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+
+                                    Text(
+                                        "See More",
+                                        color = colorResource(R.color.orange),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.clickable {
+                                            navController.navigate(Routes.SeeAllProductScreen.route)
+                                        })
+                                }
+                                LazyRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentPadding = PaddingValues(horizontal = 16.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    items(getAllSuggestedProductData) { product ->
+                                        ProductCard(
+                                            product = product,
+                                            navController = navController
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
                 }
             }
         }
@@ -249,7 +328,7 @@ fun ProductCard(product: ProductsDataModels, navController: NavController) {
         modifier = Modifier
             .width(150.dp)
             .clickable {
-                navController.navigate(Routes.EachProductDetailsScreen.route+"/${product.productId}")
+                navController.navigate(Routes.EachProductDetailsScreen.route + "/${product.productId}")
             }
             .aspectRatio(0.7f),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

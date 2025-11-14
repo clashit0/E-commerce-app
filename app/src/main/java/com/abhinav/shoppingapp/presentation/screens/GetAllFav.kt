@@ -135,7 +135,7 @@ fun GetAllFav(
 @Composable
 fun ProductCard(product: ProductsDataModels, onProductClick: () -> Unit) {
     Card(
-        onClick = { onProductClick },
+        onClick = { onProductClick() },
         modifier = Modifier.fillMaxWidth()
 
 
@@ -160,6 +160,7 @@ fun ProductCard(product: ProductsDataModels, onProductClick: () -> Unit) {
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
+
             }
         }
 

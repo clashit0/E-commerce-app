@@ -213,10 +213,38 @@ class RepoImpl @Inject constructor(
     override fun addToCart(cartDataModels: CartDataModels): Flow<ResultState<String>> =
         callbackFlow {
             trySend(ResultState.Loading)
-            firebaseFirestore.collection(ADD_TO_CART).document(firebaseAuth.currentUser!!.uid)
+
+            val userId = firebaseAuth.currentUser!!.uid
+            val cartRef = firebaseFirestore.collection(ADD_TO_CART)
+                .document(userId)
                 .collection("User_Cart")
-                .add(cartDataModels).addOnSuccessListener {
-                    trySend(ResultState.Success("Product added to the cart"))
+
+            // Check if the same product already exists in cart
+            cartRef
+                .whereEqualTo("productId", cartDataModels.productId)
+                .whereEqualTo("size", cartDataModels.size)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    if (querySnapshot.isEmpty) {
+                        // Product NOT in cart - ADD NEW item
+                        cartRef.add(cartDataModels).addOnSuccessListener {
+                            trySend(ResultState.Success("Product added to cart"))
+                        }.addOnFailureListener {
+                            trySend(ResultState.Error(it.toString()))
+                        }
+                    } else {
+                        // Product ALREADY in cart - UPDATE QUANTITY
+                        val existingItem = querySnapshot.documents.first()
+                        val currentQty = existingItem.getLong("quantity")?.toInt() ?: 0 // Now using getLong for Int
+                        val newQty = currentQty + cartDataModels.quantity // Simple addition with Int
+
+                        existingItem.reference.update("quantity", newQty)
+                            .addOnSuccessListener {
+                                trySend(ResultState.Success("Cart quantity updated to $newQty"))
+                            }.addOnFailureListener {
+                                trySend(ResultState.Error(it.toString()))
+                            }
+                    }
                 }.addOnFailureListener {
                     trySend(ResultState.Error(it.toString()))
                 }
@@ -228,12 +256,33 @@ class RepoImpl @Inject constructor(
     override fun addToFav(productsDataModels: ProductsDataModels): Flow<ResultState<String>> =
         callbackFlow {
             trySend(ResultState.Loading)
-            firebaseFirestore.collection(ADDTOFAV).document(firebaseAuth.currentUser!!.uid)
-                .collection("User_Fav").add(productsDataModels).addOnSuccessListener {
-                    trySend(ResultState.Success("Product added to the wishlist"))
-                }.addOnFailureListener {
-                    trySend(ResultState.Error(it.toString()))
+
+            val userId = firebaseAuth.currentUser!!.uid
+            val favDocRef = firebaseFirestore.collection(ADDTOFAV)
+                .document(userId)
+                .collection("User_Fav")
+                .document(productsDataModels.productId) // Use productId as document ID
+
+            // Check if already exists (get() is faster than query)
+            favDocRef.get().addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // EXISTS - REMOVE from wishlist (toggle off)
+                    favDocRef.delete().addOnSuccessListener {
+                        trySend(ResultState.Success("Product removed from wishlist"))
+                    }.addOnFailureListener {
+                        trySend(ResultState.Error(it.toString()))
+                    }
+                } else {
+                    // NOT EXISTS - ADD to wishlist (toggle on)
+                    favDocRef.set(productsDataModels).addOnSuccessListener {
+                        trySend(ResultState.Success("Product added to wishlist"))
+                    }.addOnFailureListener {
+                        trySend(ResultState.Error(it.toString()))
+                    }
                 }
+            }.addOnFailureListener {
+                trySend(ResultState.Error(it.toString()))
+            }
             awaitClose {
                 close()
             }

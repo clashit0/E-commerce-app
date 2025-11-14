@@ -5,7 +5,7 @@ data class CartDataModels(
     val name:String ="",
     var image:String ="",
     var price :String ="",
-    var quantity:String ="",
+    var quantity: Int=1,
     var cartId:String ="",
     var size:String ="",
     var description:String ="",
