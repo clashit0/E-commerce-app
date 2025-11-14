@@ -51,7 +51,8 @@ import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 fun CheckoutScreen(
     navController: NavController,
     productId: String,
-    viewModel: ShoppingAppViewModel = hiltViewModel()
+    viewModel: ShoppingAppViewModel = hiltViewModel(),
+    pay:() -> Unit
 ) {
 
     val state = viewModel.getProductByIdState.collectAsStateWithLifecycle()
@@ -296,7 +297,7 @@ fun CheckoutScreen(
 
                     Button(
                         onClick = {
-                            //pay.invoke
+                            pay.invoke()
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(colorResource(id = R.color.holo_orange_dark))

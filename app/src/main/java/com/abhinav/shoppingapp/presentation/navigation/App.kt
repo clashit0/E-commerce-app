@@ -58,7 +58,8 @@ data class BottomNavItem(val name: String, val icon: ImageVector, val unselected
 
 @Composable
 fun App(
-    firebaseAuth: FirebaseAuth
+    firebaseAuth: FirebaseAuth,
+    payTest:() -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -239,7 +240,7 @@ fun App(
                 }
 
                 composable(
-                    route = "${Routes.CheckoutScreen.route}.{prodcutId}",
+                    route = "${Routes.CheckoutScreen.route}/{productId}",
                     arguments = listOf(
                         navArgument("productId"){
                             type = NavType.StringType
@@ -249,7 +250,7 @@ fun App(
                 ){
                     navBackSTackEntry ->
                     val productId = navBackSTackEntry.arguments?.getString("productId")?:""
-                    CheckoutScreen(productId = productId, navController = navController)
+                    CheckoutScreen(productId = productId, navController = navController , pay = payTest)
 
                 }
 

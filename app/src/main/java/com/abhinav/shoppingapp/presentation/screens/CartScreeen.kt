@@ -160,7 +160,9 @@ fun CartScreen(
                         HorizontalDivider(Modifier.padding(top = 16.dp, bottom = 8.dp))
 
                         Button(
-                            onClick = {},
+                            onClick = {
+                                navController.navigate("checkout_screen")
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 5.dp),

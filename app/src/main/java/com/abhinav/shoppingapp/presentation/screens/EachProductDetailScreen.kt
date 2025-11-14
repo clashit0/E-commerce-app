@@ -72,7 +72,7 @@ fun EachProductDetailsScreen(
 
     var selectedSize by remember { mutableStateOf("") }
     var quantity by remember { mutableIntStateOf(1) }
-    val isFavourite by remember { mutableStateOf(false) }
+    var isFavourite by remember { mutableStateOf(false) }
 
 
     LaunchedEffect(key1 = Unit) {
@@ -239,7 +239,7 @@ fun EachProductDetailsScreen(
                         }
 
                         Button(
-                            onClick = { navController.navigate(Routes.CheckoutScreen.route + "/${product.productId}") },
+                            onClick = { navController.navigate(Routes.CheckoutScreen.route+"/${product.productId}") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(colorResource(id = R.color.holo_orange_dark))
                         ) {
@@ -248,7 +248,7 @@ fun EachProductDetailsScreen(
 
                         OutlinedButton(
                             onClick = {
-                                isFavourite != isFavourite
+                                isFavourite = !isFavourite
                                 viewModel.addToFav(product)
                             },
                             modifier = Modifier
