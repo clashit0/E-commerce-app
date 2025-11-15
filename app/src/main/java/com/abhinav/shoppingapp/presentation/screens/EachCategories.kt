@@ -124,14 +124,16 @@ fun EachCategoriesScreen(
                         }
                     )
 
+                    val nonNullProducts = products.filterNotNull()
+
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         contentPadding = PaddingValues(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(products) { products ->
-                            ProductItem(product = products!!,
+                        items(nonNullProducts) { products ->
+                            ProductItem(product = products,
                                 onProductClick = {
                                     navController.navigate(Routes.EachProductDetailsScreen.route+"/${products.productId}")
                                 })
