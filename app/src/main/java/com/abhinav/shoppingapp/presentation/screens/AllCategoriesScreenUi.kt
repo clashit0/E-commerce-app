@@ -98,13 +98,16 @@ fun AllCategoriesScreen(
                 }
             }
             else -> {
+               // Filter out nulls and render safely
+                val nonNullCategories = categories.filterNotNull()
+
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     contentPadding = innerpadding,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(categories) { category ->
-                        CategoryCard(category = category!!,
+                    items(nonNullCategories) { category ->
+                        CategoryCard(category = category,
                             onCategoryClick = {
                                 navController.navigate(Routes.EachCategoryItemScreens.route + "/${category.name}")
                             })
