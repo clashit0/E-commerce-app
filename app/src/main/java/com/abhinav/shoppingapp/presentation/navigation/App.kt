@@ -254,6 +254,10 @@ fun App(
 
                 }
 
+                composable(route = Routes.CheckoutScreen.route) {
+                    CheckoutScreen(navController = navController, productId = null, pay = payTest)
+                }
+
 
 
             }

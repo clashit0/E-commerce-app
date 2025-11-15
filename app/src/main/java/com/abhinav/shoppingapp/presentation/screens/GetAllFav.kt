@@ -44,7 +44,7 @@ fun GetAllFav(
     viewModel: ShoppingAppViewModel = hiltViewModel()
 ) {
     val getAllFav = viewModel.getAllFavState.collectAsStateWithLifecycle()
-    val getFavData: List<ProductsDataModels> = getAllFav.value.userData.orEmpty().filterNotNull()
+    val getFavData: List<ProductsDataModels> = getAllFav.value.userData.filterNotNull()
 
     LaunchedEffect(Unit) {
         viewModel.getAllFav()
