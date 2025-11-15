@@ -65,8 +65,17 @@ fun ProfileScreenUI(
     firebaseAuth: FirebaseAuth,
     viewModel: ShoppingAppViewModel = hiltViewModel()
 ) {
+    // Safely get currentUser; if null navigate to login/signup flow.
     LaunchedEffect(key1 = Unit) {
-        viewModel.getUserId(firebaseAuth.currentUser!!.uid)
+        val currentUser = firebaseAuth.currentUser
+        if (currentUser == null) {
+            // if user not logged in, send them to login/sign-up flow
+            navController.navigate(SubNavigation.LoginSignUpScreen.route) {
+                popUpTo(0)
+            }
+        } else {
+            viewModel.getUserId(currentUser.uid)
+        }
     }
 
     val profileScreenState = viewModel.profileScreenState.collectAsStateWithLifecycle()
@@ -345,6 +354,11 @@ fun ProfileScreenUI(
                     )
                 }
             }
+        }
+    }else {
+        // No user data available - show fallback UI
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = "No profile data available.")
         }
     }
 }

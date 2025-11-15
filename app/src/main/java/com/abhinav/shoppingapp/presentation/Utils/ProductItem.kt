@@ -56,7 +56,7 @@ fun ProductItem(
                 )
 
                 Text(
-                    text = "$${product.finalPrice}",
+                    text = "Rs ${product.finalPrice}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
