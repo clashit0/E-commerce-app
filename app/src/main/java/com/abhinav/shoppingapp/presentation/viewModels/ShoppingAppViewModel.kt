@@ -26,6 +26,7 @@ import com.abhinav.shoppingapp.domain.useCase.GetProductsInLimit
 import com.abhinav.shoppingapp.domain.useCase.GetSpecificCategoryItems
 import com.abhinav.shoppingapp.domain.useCase.GetUserUseCase
 import com.abhinav.shoppingapp.domain.useCase.LoginUserUseCase
+import com.abhinav.shoppingapp.domain.useCase.RemoveFromFavUseCase
 import com.abhinav.shoppingapp.domain.useCase.UpdateUseDataUseCase
 import com.abhinav.shoppingapp.domain.useCase.UserProfileImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,6 +56,7 @@ class ShoppingAppViewModel @Inject constructor(
     private val userProfileImageUseCase: UserProfileImageUseCase,
     private val getBannerUseCase: GetBannerUseCase,
     private val getProfileUseCase: GetUserUseCase,
+    private val removeFromFavUseCase: RemoveFromFavUseCase
 
     ) : ViewModel() {
     private val _signUpScreeState = MutableStateFlow(SignUpScreenState())
@@ -608,6 +610,32 @@ class ShoppingAppViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun removeFromFav(productId: String){
+        viewModelScope.launch {
+            removeFromFavUseCase.removeFromFavUseCase(productId).collect { result ->
+                when(result){
+                    is ResultState.Error -> {
+                        _addToFavState.value = _addToFavState.value.copy(
+                            isLoading = false,
+                            errorMessage = result.message
+                        )
+                    }
+                    is ResultState.Loading -> {
+                        _addToFavState.value = _addToFavState.value.copy(isLoading = true)
+                    }
+                    is ResultState.Success -> {
+                        _addToFavState.value = _addToFavState.value.copy(
+                            isLoading = false,
+                            userData = result.data
+                        )
+                        // Refresh favourites so UI updates (source of truth)
+                        getAllFav()
+                    }
+                }
+            }
+        }
     }
 
 }

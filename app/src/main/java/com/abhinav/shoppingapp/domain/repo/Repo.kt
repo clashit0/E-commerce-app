@@ -29,6 +29,7 @@ interface Repo {
     fun getBanner():Flow<ResultState<List<BannerDataModels>>>
     fun getSpecificCategoryItems(categoryName: String):Flow<ResultState<List<ProductsDataModels>>>
     fun getAllSuggestedProducts():Flow<ResultState<List<ProductsDataModels>>>
+    fun removeFromFav(productId: String): Flow<ResultState<String>>
 
 
 }

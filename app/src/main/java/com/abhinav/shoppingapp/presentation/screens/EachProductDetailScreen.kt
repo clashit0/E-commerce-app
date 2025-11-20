@@ -54,6 +54,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.abhinav.shoppingapp.domain.models.CartDataModels
+import com.abhinav.shoppingapp.domain.models.ProductsDataModels
 import com.abhinav.shoppingapp.presentation.navigation.Routes
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
 
@@ -69,16 +70,24 @@ fun EachProductDetailsScreen(
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
+
+    val getFavState = viewModel.getAllFavState.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
 
     var selectedSize by remember { mutableStateOf("") }
     var quantity by remember { mutableIntStateOf(1) }
-    var isFavourite by rememberSaveable { mutableStateOf(false) }
 
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getProductById(productId)
+        viewModel.getAllFav()
     }
+
+    val favList = getFavState.value.userData.orEmpty().filterNotNull()
+    var isFavourite = favList.any{it.productId == productId}
+
+
 
     Scaffold(
         modifier = Modifier
@@ -249,8 +258,11 @@ fun EachProductDetailsScreen(
 
                         OutlinedButton(
                             onClick = {
-                                isFavourite = !isFavourite
-                                viewModel.addToFav(product)
+                                if (isFavourite){
+                                    viewModel.removeFromFav(productId)
+                                }else{
+                                    viewModel.addToFav(product)
+                                }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -267,7 +279,8 @@ fun EachProductDetailsScreen(
                                     contentDescription = "Favourite"
                                 )
 
-                                Text("Add to Wishlist")
+                                Text(if(isFavourite)"Remove from favourite" else "Add to favourite")
+
 
 
                             }

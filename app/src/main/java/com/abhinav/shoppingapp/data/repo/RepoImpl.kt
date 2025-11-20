@@ -228,7 +228,7 @@ class RepoImpl @Inject constructor(
                     try {
                         if (querySnapshot.isEmpty) {
 
-                            if(cartDataModels.quantity <= 0){
+                            if (cartDataModels.quantity <= 0) {
                                 trySend(ResultState.Success("Cannot decrease quantity: item not in cart"))
                                 return@addOnSuccessListener
                             }
@@ -247,11 +247,11 @@ class RepoImpl @Inject constructor(
                                 val currentQty = snapshot.getLong("quantity")?.toInt() ?: 0
                                 val newQty = currentQty + cartDataModels.quantity
 
-                                if (newQty <=0){
+                                if (newQty <= 0) {
                                     transaction.delete(docRef)
                                     -1
-                                }else{
-                                    transaction.update(docRef,"quantity",newQty)
+                                } else {
+                                    transaction.update(docRef, "quantity", newQty)
                                     newQty
                                 }
 
@@ -264,13 +264,17 @@ class RepoImpl @Inject constructor(
                                     trySend(ResultState.Success("Cart quantity updated to $resultQty"))
                                 }
                             }.addOnFailureListener { exception ->
-                                trySend(ResultState.Error(exception.localizedMessage ?: exception.toString()))
+                                trySend(
+                                    ResultState.Error(
+                                        exception.localizedMessage ?: exception.toString()
+                                    )
+                                )
 
                             }
 
 
                         }
-                    }catch(ex: Exception){
+                    } catch (ex: Exception) {
                         trySend(ResultState.Error(ex.localizedMessage ?: ex.toString()))
                     }
                 }.addOnFailureListener {
@@ -435,6 +439,48 @@ class RepoImpl @Inject constructor(
                     trySend(ResultState.Success(fav))
                 }.addOnFailureListener {
                     trySend(ResultState.Error(it.toString()))
+                }
+            awaitClose {
+                close()
+            }
+        }
+
+    override fun removeFromFav(productId: String): Flow<ResultState<String>> =
+        callbackFlow {
+            trySend(ResultState.Loading)
+
+            val userId = firebaseAuth.currentUser?.uid
+            if (userId.isNullOrBlank()) {
+                trySend(ResultState.Error("User not logged in"))
+                awaitClose { close() }
+                return@callbackFlow
+            }
+
+            val favCollection = firebaseFirestore
+                .collection(ADDTOFAV)
+                .document(userId)
+                .collection("User_Fav")
+
+            favCollection
+                .whereEqualTo("productId",productId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    try {
+                        if (querySnapshot.isEmpty){
+                            trySend(ResultState.Error("Product not found in favourites"))
+                        }else{
+                            val deleteTasks = querySnapshot.documents.mapNotNull { it.reference.delete() }
+
+                            com.google.android.gms.tasks.Tasks.whenAll(deleteTasks).addOnSuccessListener {
+                                trySend(ResultState.Success("Removed from favourites"))
+                            }.addOnFailureListener { ex ->
+                                trySend(ResultState.Error(ex.localizedMessage ?: ex.toString()))
+                            }
+                        }
+
+                    }catch (ex: Exception){
+                        trySend(ResultState.Error(ex.localizedMessage ?: ex.toString()))
+                    }
                 }
             awaitClose {
                 close()
