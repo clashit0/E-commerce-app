@@ -225,25 +225,53 @@ class RepoImpl @Inject constructor(
                 .whereEqualTo("size", cartDataModels.size)
                 .get()
                 .addOnSuccessListener { querySnapshot ->
-                    if (querySnapshot.isEmpty) {
-                        // Product NOT in cart - ADD NEW item
-                        cartRef.add(cartDataModels).addOnSuccessListener {
-                            trySend(ResultState.Success("Product added to cart"))
-                        }.addOnFailureListener {
-                            trySend(ResultState.Error(it.toString()))
-                        }
-                    } else {
-                        // Product ALREADY in cart - UPDATE QUANTITY
-                        val existingItem = querySnapshot.documents.first()
-                        val currentQty = existingItem.getLong("quantity")?.toInt() ?: 0 // Now using getLong for Int
-                        val newQty = currentQty + cartDataModels.quantity // Simple addition with Int
+                    try {
+                        if (querySnapshot.isEmpty) {
 
-                        existingItem.reference.update("quantity", newQty)
-                            .addOnSuccessListener {
-                                trySend(ResultState.Success("Cart quantity updated to $newQty"))
+                            if(cartDataModels.quantity <= 0){
+                                trySend(ResultState.Success("Cannot decrease quantity: item not in cart"))
+                                return@addOnSuccessListener
+                            }
+                            // Product NOT in cart - ADD NEW item
+                            cartRef.add(cartDataModels).addOnSuccessListener {
+                                trySend(ResultState.Success("Product added to cart"))
                             }.addOnFailureListener {
                                 trySend(ResultState.Error(it.toString()))
                             }
+                        } else {
+                            // Product ALREADY in cart - UPDATE QUANTITY
+                            val docRef = querySnapshot.documents.first().reference
+
+                            val txnTask = firebaseFirestore.runTransaction { transaction ->
+                                val snapshot = transaction.get(docRef)
+                                val currentQty = snapshot.getLong("quantity")?.toInt() ?: 0
+                                val newQty = currentQty + cartDataModels.quantity
+
+                                if (newQty <=0){
+                                    transaction.delete(docRef)
+                                    -1
+                                }else{
+                                    transaction.update(docRef,"quantity",newQty)
+                                    newQty
+                                }
+
+                            }
+
+                            txnTask.addOnSuccessListener { resultQty ->
+                                if (resultQty == -1) {
+                                    trySend(ResultState.Success("Product removed from cart"))
+                                } else {
+                                    trySend(ResultState.Success("Cart quantity updated to $resultQty"))
+                                }
+                            }.addOnFailureListener { exception ->
+                                trySend(ResultState.Error(exception.localizedMessage ?: exception.toString()))
+
+                            }
+
+
+                        }
+                    }catch(ex: Exception){
+                        trySend(ResultState.Error(ex.localizedMessage ?: ex.toString()))
                     }
                 }.addOnFailureListener {
                     trySend(ResultState.Error(it.toString()))

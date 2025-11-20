@@ -226,7 +226,7 @@ fun CheckoutScreen(
                         Text("Your items", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(12.dp))
                         nonNullCart.forEach { cartItem ->
                             // Reuse CartItemCard visual; if you want a compact variant, you can create a compact card
-                            CartItemCard(item = cartItem)
+                            CartItemCard(item = cartItem,viewModel = viewModel)
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))

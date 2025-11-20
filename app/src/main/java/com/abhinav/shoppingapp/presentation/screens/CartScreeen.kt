@@ -153,8 +153,10 @@ fun CartScreen(
                         LazyColumn(
                             Modifier.weight(.6f)
                         ) {
-                            items(cardData) { cartItem ->
-                                CartItemCard(item= cartItem!! )
+
+                            val nonNullCartItems = cardData.filterNotNull()
+                            items(nonNullCartItems) { cartItem ->
+                                CartItemCard(item = cartItem, viewModel = viewModel )
                             }
                         }
                         HorizontalDivider(Modifier.padding(top = 16.dp, bottom = 8.dp))
@@ -181,7 +183,10 @@ fun CartScreen(
 }
 
 @Composable
-fun CartItemCard(item: CartDataModels) {
+fun CartItemCard(
+    item: CartDataModels,
+    viewModel: ShoppingAppViewModel
+) {
     Card(
         Modifier
             .fillMaxWidth()
@@ -229,8 +234,49 @@ fun CartItemCard(item: CartDataModels) {
             Column(
                 horizontalAlignment = Alignment.End
             ) {
-                Text("Qty : ${item.quantity}",
-                    style = MaterialTheme.typography.bodyMedium)
+
+                Row {
+                    IconButton(onClick = {
+                        val decrease = CartDataModels(
+                            productId = item.productId,
+                            name = item.name,
+                            price = item.price,
+                            image = item.image,
+                            size = item.size,
+                            quantity = -1,
+                            description = item.description,
+                            category = item.category
+
+                        )
+                        viewModel.addToCart(decrease)
+                    }) {
+                        Text("-",
+                            style = MaterialTheme.typography.headlineSmall)
+                    }
+
+                    Text(
+                        "Qty : ${item.quantity}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    IconButton(onClick = {
+                        val decrease = CartDataModels(
+                            productId = item.productId,
+                            name = item.name,
+                            price = item.price,
+                            image = item.image,
+                            size = item.size,
+                            quantity = +1,
+                            description = item.description,
+                            category = item.category
+
+                        )
+                        viewModel.addToCart(decrease)
+                    }) {
+                        Text("+",
+                            style = MaterialTheme.typography.headlineSmall)
+                    }
+                }
             }
         }
     }
