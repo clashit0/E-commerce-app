@@ -307,6 +307,7 @@ class ShoppingAppViewModel @Inject constructor(
                             isLoading = false,
                             userData = it.data
                         )
+                        getAllFav()
                     }
 
                 }

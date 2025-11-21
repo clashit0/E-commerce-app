@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity(), PaymentResultWithDataListener {
         enableEdgeToEdge()
         setContent {
             ShoppingAppTheme {
-                MainScreen(firebaseAuth) { }
+                MainScreen(firebaseAuth,{startPayment()})
             }
         }
     }
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity(), PaymentResultWithDataListener {
         if (showSplashScreen.value) {
             SplashScreen()
         } else {
-            App(firebaseAuth, { onPayTest })
+            App(firebaseAuth, { onPayTest() })
         }
     }
 

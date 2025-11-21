@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -38,7 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,9 +56,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.abhinav.shoppingapp.domain.models.CartDataModels
-import com.abhinav.shoppingapp.domain.models.ProductsDataModels
 import com.abhinav.shoppingapp.presentation.navigation.Routes
 import com.abhinav.shoppingapp.presentation.viewModels.ShoppingAppViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -69,9 +71,15 @@ fun EachProductDetailsScreen(
     val getProductById = viewModel.getProductByIdState.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val snackBarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
 
     val getFavState = viewModel.getAllFavState.collectAsStateWithLifecycle()
+    val addToFavState =
+        viewModel.addToFavState.collectAsStateWithLifecycle() // observe add/remove progress & messages
+
+    val addToCartState = viewModel.addToCartState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
@@ -85,7 +93,39 @@ fun EachProductDetailsScreen(
     }
 
     val favList = getFavState.value.userData.orEmpty().filterNotNull()
-    var isFavourite = favList.any{it.productId == productId}
+    val isFavourite = favList.any { it.productId == productId }
+
+    LaunchedEffect(
+        addToFavState.value.errorMessage,
+        addToFavState.value.isLoading,
+        addToFavState.value.userData,
+        addToCartState.value.errorMessage,
+        addToFavState.value.isLoading,
+        addToCartState.value.userData
+    ) {
+        addToFavState.value.errorMessage?.let { err ->
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(err)
+            }
+        }
+
+        addToFavState.value.userData?.let {successMsg ->
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(successMsg)
+            }
+        }
+        addToCartState.value.errorMessage?.let { err ->
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(err)
+            }
+        }
+
+        addToCartState.value.userData?.let {successMsg ->
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(successMsg)
+            }
+        }
+    }
 
 
 
@@ -106,7 +146,8 @@ fun EachProductDetailsScreen(
                 },
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
 
     ) { innerPadding ->
 
@@ -228,6 +269,8 @@ fun EachProductDetailsScreen(
                         )
                         Text(product.description)
 
+                        val isCartActionInProgress = addToCartState.value.isLoading
+
                         Button(
                             onClick = {
                                 val cartDataModels = CartDataModels(
@@ -243,30 +286,35 @@ fun EachProductDetailsScreen(
                                 viewModel.addToCart(cartDataModels)
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(colorResource(id = R.color.holo_orange_dark))
+                            colors = ButtonDefaults.buttonColors(colorResource(id = R.color.holo_orange_dark)
+                                ),
+                            enabled = !isCartActionInProgress
                         ) {
                             Text("Add to cart")
                         }
 
                         Button(
-                            onClick = { navController.navigate(Routes.CheckoutScreen.route+"/${product.productId}") },
+                            onClick = { navController.navigate(Routes.CheckoutScreen.route + "/${product.productId}") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(colorResource(id = R.color.holo_orange_dark))
                         ) {
                             Text("Buy now")
                         }
 
+                        val isFavActionInProgress = addToFavState.value.isLoading
+
                         OutlinedButton(
                             onClick = {
-                                if (isFavourite){
+                                if (isFavourite) {
                                     viewModel.removeFromFav(productId)
-                                }else{
+                                } else {
                                     viewModel.addToFav(product)
                                 }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(8.dp)
+                                .padding(8.dp),
+                            enabled = !isFavActionInProgress
                         ) {
                             Row {
                                 Icon(
@@ -279,8 +327,7 @@ fun EachProductDetailsScreen(
                                     contentDescription = "Favourite"
                                 )
 
-                                Text(if(isFavourite)"Remove from favourite" else "Add to favourite")
-
+                                Text(if (isFavourite) "Remove from favourite" else "Add to favourite")
 
 
                             }
